@@ -7,30 +7,44 @@ import React, { useEffect, useRef } from 'react'
 import { useAnimations, useFBX, useGLTF } from '@react-three/drei'
 import { useFrame } from '@react-three/fiber'
 import { useControls } from 'leva'
+import * as THREE from 'three'
 
 export function Avatar(props) {
-  const {headFollow} = useControls({
+  const {animation} = props;
+  const {headFollow, cursorFollow} = useControls({
     headFollow: false,
+    cursorFollow: false,
   })
     const group = useRef()
   const { nodes, materials } = useGLTF('models/6669695f0484520d3009878a.glb')
 
   const {animations: typingAnimation} = useFBX('animations/Typing.fbx')
+  const {animations: standingAnimation} = useFBX('animations/Standing Idle.fbx')
+  const {animations: fallingAnimation} = useFBX('animations/Falling Idle.fbx')
 
   typingAnimation[0].name = "Typing"
+  standingAnimation[0].name = "Standing"
+  fallingAnimation[0].name = "Falling"
 
 
-  const {actions} =  useAnimations(typingAnimation, group);
+  const {actions} =  useAnimations([typingAnimation[0], standingAnimation[0],fallingAnimation[0]], group);
 
   useFrame((state)=>{
     if(headFollow){
     group.current.getObjectByName("Head").lookAt(state.camera.position)
     }
+    if(cursorFollow){
+      const target = new THREE.Vector3(state.mouse.x, state.mouse.y, 1);
+      group.current.getObjectByName("Spine2").lookAt(target)
+    }
   })
 
   useEffect(()=>{
-    actions["Typing"].reset().play()
-  },[])
+    actions[animation].reset().play()
+    return ()=>{
+      actions[animation].reset().stop()
+    }
+  },[animation])
 
   return (
     <group {...props} ref={group} dispose={null}>
