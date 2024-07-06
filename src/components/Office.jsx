@@ -1,9 +1,13 @@
 import { useGLTF, useTexture } from "@react-three/drei";
-import React from "react";
+import React, { useEffect } from "react";
+import {motion} from "framer-motion-3d"
 
 import * as THREE from "three";
+import { animate, useMotionValue } from "framer-motion";
+import { useFrame } from "@react-three/fiber";
 
 export function Office(props) {
+    const {section} = props
   const { nodes, materials } = useGLTF("models/scene.gltf");
   const texture = useTexture("textures/baked.jpg");
   texture.flipY = false;
@@ -11,6 +15,8 @@ export function Office(props) {
 
   const textureMaterial = new THREE.MeshStandardMaterial({
     map: texture,
+    transparent:true,
+    opacity:1
   });
 
   const textureGlassMaterial = new THREE.MeshStandardMaterial({
@@ -18,6 +24,20 @@ export function Office(props) {
     transparent: true,
     opacity: 0.42,
   });
+
+  const textureOpacity = useMotionValue(0)
+  const glassTextureOpacity = useMotionValue(0)
+
+  useEffect(()=>{
+    animate(textureOpacity, section === 0 ? 1 : 0)
+    animate(glassTextureOpacity, section === 0 ? 0.42 : 0)
+  },[section])
+
+
+  useFrame(()=>{
+    textureMaterial.opacity = textureOpacity.get()
+    textureGlassMaterial.opacity = glassTextureOpacity.get()
+  })
 
   return (
     <group {...props} dispose={null}>
@@ -64,7 +84,9 @@ export function Office(props) {
           material={textureMaterial}
         />
       </group>
-      <group name="LavaLamp" position={[-1.3, 2.07, -1.99]}>
+      <motion.group scale={[0,0,0]} animate={{
+        scale: section === 0 ? 1 : 0
+      }} name="LavaLamp" position={[-1.3, 2.07, -1.99]}>
         <mesh
           name="Node-Mesh001"
           geometry={nodes["Node-Mesh001"].geometry}
@@ -80,14 +102,20 @@ export function Office(props) {
           geometry={nodes["Node-Mesh001_2"].geometry}
           material={textureMaterial}
         />
-      </group>
-      <mesh
+      </motion.group>
+      <motion.mesh 
+      scale={[0,0,0]} animate={{
+        scale: section === 0 ? 1 : 0
+      }}
         name="WawaRug"
         geometry={nodes.WawaRug.geometry}
         material={textureMaterial}
         position={[-0.28, 0.01, 0.76]}
       />
-      <group
+      <motion.group
+      scale={[0,0,0]} animate={{
+        scale: section === 0 ? 1 : 0
+      }}
         name="salameche"
         position={[-0.61, 2.04, -1.96]}
         rotation={[-Math.PI, 0.73, -Math.PI]}
@@ -122,7 +150,7 @@ export function Office(props) {
           geometry={nodes.mesh434900071_5.geometry}
           material={textureMaterial}
         />
-      </group>
+      </motion.group>
       <group
         name="keyboard"
         position={[-0.04, 0.98, -1.35]}
@@ -149,7 +177,10 @@ export function Office(props) {
           material={textureMaterial}
         />
       </group>
-      <group
+      <motion.group
+      scale={[0,0,0]} animate={{
+        scale: section === 0 ? 1 : 0
+      }}
         name="iMac"
         position={[0.45, 0.94, -1.72]}
         rotation={[Math.PI, -1.1, Math.PI]}
@@ -169,7 +200,7 @@ export function Office(props) {
           geometry={nodes.iMac_1_2.geometry}
           material={textureMaterial}
         />
-      </group>
+      </motion.group>
       <mesh
         name="Comp_Mouse"
         geometry={nodes.Comp_Mouse.geometry}
@@ -192,7 +223,10 @@ export function Office(props) {
           material={textureMaterial}
         />
       </group>
-      <group
+      <motion.group
+      scale={[0,0,0]} animate={{
+        scale: section === 0 ? 1 : 0
+      }}
         name="Houseplant_7"
         position={[-2.02, -0.04, -1.53]}
         rotation={[-Math.PI / 2, 0, 0]}
@@ -212,8 +246,11 @@ export function Office(props) {
           geometry={nodes.Houseplant_7_3.geometry}
           material={textureMaterial}
         />
-      </group>
-      <group
+      </motion.group>
+      <motion.group
+      scale={[0,0,0]} animate={{
+        scale: section === 0 ? 1 : 0
+      }}
         name="palm_tree_01"
         position={[2.13, -0.08, -1.06]}
         rotation={[-Math.PI, 0.67, -Math.PI]}
@@ -233,8 +270,12 @@ export function Office(props) {
           geometry={nodes["palm_tree_01-Mesh_2"].geometry}
           material={textureMaterial}
         />
-      </group>
-      <group name="Chair" position={[-0.28, 0, -0.71]} rotation={[0, -0.38, 0]}>
+      </motion.group>
+      <motion.group 
+      scale={[0,0,0]} animate={{
+        scale: section === 0 ? 1 : 0
+      }}
+      name="Chair" position={[-0.28, 0, -0.71]} rotation={[0, -0.38, 0]}>
         <mesh
           name="Node-Mesh"
           geometry={nodes["Node-Mesh"].geometry}
@@ -245,7 +286,7 @@ export function Office(props) {
           geometry={nodes["Node-Mesh_1"].geometry}
           material={textureMaterial}
         />
-      </group>
+      </motion.group>
       <mesh
         name="Plane001"
         geometry={nodes.Plane001.geometry}
